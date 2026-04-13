@@ -1,0 +1,26 @@
+# cronwatch webhook notification example
+# Add this section to your cronwatch.yaml to enable generic webhook alerts.
+
+# webhook:
+#   url: "https://hooks.example.com/services/TOKEN"
+#
+#   # HTTP method (default: POST)
+#   method: POST
+#
+#   # Custom headers sent with every request
+#   headers:
+#     Content-Type: "application/json"
+#     Authorization: "Bearer YOUR_TOKEN"
+#
+#   # Send a webhook when the job succeeds (default: false)
+#   notify_on_success: false
+#
+#   # Send a webhook when the job fails (default: true)
+#   notify_on_failure: true
+#
+#   # HTTP request timeout in seconds (default: 10)
+#   timeout: 10
+
+# Minimal example — only required field is `url`:
+# webhook:
+#   url: "https://hooks.example.com/services/TOKEN"

@@ -1,65 +1,80 @@
-"""Configuration loader for cronwatch."""
+"""Configuration loading for cronwatch."""
+
+from __future__ import annotations
 
 import os
-import yaml
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Dict, List, Optional
 
+import yaml
 
-DEFAULT_CONFIG_PATH = os.path.expanduser("~/.cronwatch/config.yaml")
+DEFAULT_CONFIG_PATH = os.path.expanduser("~/.cronwatch.yaml")
 
 
 @dataclass
 class SlackConfig:
-    webhook_url: Optional[str] = None
-    channel: Optional[str] = None
+    webhook_url: str = ""
+    channel: str = ""
+    notify_on_success: bool = False
 
 
 @dataclass
 class EmailConfig:
-    smtp_host: Optional[str] = None
-    smtp_port: int = 587
-    username: Optional[str] = None
-    password: Optional[str] = None
-    from_addr: Optional[str] = None
-    to_addrs: list = field(default_factory=list)
+    smtp_host: str = "localhost"
+    smtp_port: int = 25
+    from_addr: str = ""
+    to_addrs: List[str] = field(default_factory=list)
+    notify_on_success: bool = False
+
+
+@dataclass
+class WebhookConfig:
+    """Generic outbound webhook configuration."""
+    url: str = ""
+    method: str = "POST"
+    headers: Dict[str, str] = field(
+        default_factory=lambda: {"Content-Type": "application/json"}
+    )
+    notify_on_success: bool = False
+    notify_on_failure: bool = True
+    timeout: int = 10
 
 
 @dataclass
 class CronwatchConfig:
     log_dir: str = "/var/log/cronwatch"
-    retention_days: int = 30
-    slack: SlackConfig = field(default_factory=SlackConfig)
-    email: EmailConfig = field(default_factory=EmailConfig)
+    history_dir: str = "/var/lib/cronwatch"
+    default_timeout: Optional[int] = None
+    slack: Optional[SlackConfig] = None
+    email: Optional[EmailConfig] = None
+    webhook: Optional[WebhookConfig] = None
 
 
 def load_config(path: str = DEFAULT_CONFIG_PATH) -> CronwatchConfig:
-    """Load configuration from a YAML file.
-
-    Falls back to defaults if the file does not exist.
-    """
+    """Load configuration from *path*, returning defaults if the file is absent."""
     if not os.path.exists(path):
         return CronwatchConfig()
 
-    with open(path, "r") as fh:
+    with open(path) as fh:
         raw = yaml.safe_load(fh) or {}
 
-    slack_raw = raw.get("slack", {})
-    email_raw = raw.get("email", {})
+    slack = None
+    if slack_raw := raw.get("slack"):
+        slack = SlackConfig(**{k: v for k, v in slack_raw.items() if k in SlackConfig.__dataclass_fields__})
+
+    email = None
+    if email_raw := raw.get("email"):
+        email = EmailConfig(**{k: v for k, v in email_raw.items() if k in EmailConfig.__dataclass_fields__})
+
+    webhook = None
+    if wh_raw := raw.get("webhook"):
+        webhook = WebhookConfig(**{k: v for k, v in wh_raw.items() if k in WebhookConfig.__dataclass_fields__})
 
     return CronwatchConfig(
         log_dir=raw.get("log_dir", "/var/log/cronwatch"),
-        retention_days=int(raw.get("retention_days", 30)),
-        slack=SlackConfig(
-            webhook_url=slack_raw.get("webhook_url"),
-            channel=slack_raw.get("channel"),
-        ),
-        email=EmailConfig(
-            smtp_host=email_raw.get("smtp_host"),
-            smtp_port=int(email_raw.get("smtp_port", 587)),
-            username=email_raw.get("username"),
-            password=email_raw.get("password"),
-            from_addr=email_raw.get("from_addr"),
-            to_addrs=email_raw.get("to_addrs", []),
-        ),
+        history_dir=raw.get("history_dir", "/var/lib/cronwatch"),
+        default_timeout=raw.get("default_timeout"),
+        slack=slack,
+        email=email,
+        webhook=webhook,
     )

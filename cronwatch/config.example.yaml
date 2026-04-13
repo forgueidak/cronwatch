@@ -1,43 +1,48 @@
 # cronwatch configuration example
-# Copy to config.yaml and adjust as needed.
+# Copy to cronwatch/config.yaml and customise.
 
+# Directory where job logs are written
+log_dir: ~/.cronwatch/logs
+
+# Directory where job history (JSON lines) is stored
+history_dir: ~/.cronwatch/history
+
+# Directory used to persist alert throttle state
+alert_state_dir: ~/.cronwatch/alert_state
+
+# How long (seconds) to suppress repeated alerts for the same failing job.
+# Default: 3600 (1 hour). Set to 0 to disable throttling.
+alert_throttle_seconds: 3600
+
+# Slack integration (optional)
 slack:
-  webhook_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
-  channel: "#alerts"
-  username: "cronwatch"
+  enabled: false
+  webhook_url: https://hooks.slack.com/services/XXX/YYY/ZZZ
+  channel: "#ops-alerts"
+  username: cronwatch
+  # notify even when the job succeeds
+  notify_on_success: false
 
+# Email integration (optional)
 email:
-  smtp_host: "smtp.example.com"
+  enabled: false
+  smtp_host: smtp.example.com
   smtp_port: 587
-  from_addr: "cronwatch@example.com"
+  smtp_user: alerts@example.com
+  smtp_password: secret
+  from_addr: alerts@example.com
   to_addrs:
-    - "ops@example.com"
-  username: "cronwatch@example.com"
-  password: "secret"
+    - oncall@example.com
+  use_tls: true
+  notify_on_success: false
 
+# Jobs watched via `cronwatch watch`
 jobs:
-  - name: "nightly-backup"
-    command: "/usr/local/bin/backup.sh"
+  - name: nightly-backup
+    command: /usr/local/bin/backup.sh
     schedule: "0 2 * * *"
-    timeout: 3600
-    notify_on_success: false
-    retry:
-      max_attempts: 3
-      delay_seconds: 60
-      backoff_factor: 2.0
-      retry_on_timeout: false
-
-  - name: "hourly-sync"
-    command: "/usr/local/bin/sync.sh"
+    timeout: 1800
+  - name: hourly-sync
+    command: /usr/local/bin/sync.sh
     schedule: "@hourly"
     timeout: 300
-    notify_on_success: false
-    retry:
-      max_attempts: 2
-      delay_seconds: 10
-      backoff_factor: 1.0
-      retry_on_timeout: true
-
-log_dir: "/var/log/cronwatch"
-history_dir: "/var/lib/cronwatch/history"
-retention_days: 30

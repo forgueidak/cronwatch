@@ -1,0 +1,23 @@
+# cronwatch lockfile configuration example
+# Lockfiles prevent the same cron job from running concurrently.
+# If a second invocation detects an active lock it exits immediately.
+
+jobs:
+  - name: nightly-backup
+    command: /usr/local/bin/backup.sh
+    schedule: "0 2 * * *"
+
+    # Lockfile settings (all optional)
+    lock:
+      # Set to false to disable locking entirely for this job.
+      enabled: true
+
+      # Directory where .lock files are stored.
+      # Defaults to /tmp/cronwatch/locks
+      lock_dir: /var/run/cronwatch/locks
+
+      # Seconds after which an existing lock is considered stale and
+      # will be forcibly removed before a new run starts.
+      # Useful when a previous run crashed without cleaning up.
+      # Default: 3600 (1 hour)
+      stale_after: 7200

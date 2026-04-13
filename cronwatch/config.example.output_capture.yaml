@@ -1,0 +1,29 @@
+# cronwatch output_capture configuration example
+# Controls how stdout/stderr from cron jobs are captured and stored.
+
+output_capture:
+  # Set to false to disable all output capture (stdout/stderr will be empty strings)
+  enabled: true
+
+  # Maximum number of bytes to retain per stream (default: 65536 = 64 KB)
+  max_bytes: 65536
+
+  # Maximum number of lines to retain per stream (default: 500)
+  max_lines: 500
+
+  # Text appended when output is cut short
+  truncation_marker: "... [truncated]"
+
+  # Capture stdout from the job process
+  capture_stdout: true
+
+  # Capture stderr from the job process
+  capture_stderr: true
+
+# Example: capture only stderr, with a tighter limit
+# output_capture:
+#   enabled: true
+#   max_bytes: 8192
+#   max_lines: 100
+#   capture_stdout: false
+#   capture_stderr: true

@@ -1,37 +1,43 @@
 # cronwatch configuration example
 # Copy to config.yaml and adjust as needed.
 
-# --- Job definitions -------------------------------------------------------
-jobs:
-  - name: backup-db
-    command: "/usr/local/bin/backup.sh"
-    schedule: "0 2 * * *"          # daily at 02:00  (or @daily)
-    timeout: 300                   # seconds; omit for no timeout
-
-  - name: send-report
-    command: "python /opt/reports/send.py"
-    schedule: "@weekly"
-
-# --- Slack integration -----------------------------------------------------
 slack:
-  enabled: true
-  webhook_url: "https://hooks.slack.com/services/XXX/YYY/ZZZ"
+  webhook_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
   channel: "#alerts"
-  notify_on_success: false
+  username: "cronwatch"
 
-# --- Email integration -----------------------------------------------------
 email:
-  enabled: false
   smtp_host: "smtp.example.com"
   smtp_port: 587
-  username: "alerts@example.com"
-  password: "s3cr3t"
-  from_addr: "alerts@example.com"
+  from_addr: "cronwatch@example.com"
   to_addrs:
     - "ops@example.com"
-  notify_on_success: false
+  username: "cronwatch@example.com"
+  password: "secret"
 
-# --- Logging ---------------------------------------------------------------
-logging:
-  log_dir: "/var/log/cronwatch"
-  level: "INFO"
+jobs:
+  - name: "nightly-backup"
+    command: "/usr/local/bin/backup.sh"
+    schedule: "0 2 * * *"
+    timeout: 3600
+    notify_on_success: false
+    retry:
+      max_attempts: 3
+      delay_seconds: 60
+      backoff_factor: 2.0
+      retry_on_timeout: false
+
+  - name: "hourly-sync"
+    command: "/usr/local/bin/sync.sh"
+    schedule: "@hourly"
+    timeout: 300
+    notify_on_success: false
+    retry:
+      max_attempts: 2
+      delay_seconds: 10
+      backoff_factor: 1.0
+      retry_on_timeout: true
+
+log_dir: "/var/log/cronwatch"
+history_dir: "/var/lib/cronwatch/history"
+retention_days: 30

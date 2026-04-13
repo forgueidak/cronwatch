@@ -1,0 +1,29 @@
+# cronwatch snapshot configuration example
+# Snapshots capture stdout hashes between runs so you can detect
+# unexpected changes in job output.
+
+jobs:
+  - command: "/usr/local/bin/generate-report.sh"
+    schedule: "0 6 * * *"
+    snapshot:
+      enabled: true
+      # Directory where snapshot files are stored.
+      # Defaults to .cronwatch/snapshots relative to the working directory.
+      dir: "/var/lib/cronwatch/snapshots"
+      # When true, a notification is sent whenever the output changes
+      # compared to the previous successful run.
+      notify_on_change: true
+
+  - command: "/usr/bin/check-inventory"
+    schedule: "*/15 * * * *"
+    snapshot:
+      enabled: true
+      dir: "/var/lib/cronwatch/snapshots"
+      # Set to false to only log the change without alerting.
+      notify_on_change: false
+
+  - command: "/usr/bin/backup.sh"
+    schedule: "@daily"
+    snapshot:
+      # Snapshots disabled for this job — output is not compared.
+      enabled: false

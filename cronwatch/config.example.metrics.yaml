@@ -1,0 +1,33 @@
+# cronwatch metrics configuration example
+#
+# Metrics tracking records per-job timing and success/failure counts
+# to a local JSONL file, enabling trend analysis over time.
+
+metrics:
+  # Enable or disable metrics collection (default: false)
+  enabled: true
+
+  # Directory where per-job metric files are stored.
+  # One .jsonl file is created per unique command.
+  metrics_dir: ~/.cronwatch/metrics
+
+  # Optional: limit how many recent data points are considered
+  # when computing summaries. Older points remain on disk.
+  # retain_limit: 100
+
+  # Optional list of tags to attach to every recorded metric point.
+  # Useful for grouping metrics by environment or role.
+  tags:
+    - production
+    - nightly
+
+# Example job block referencing metrics:
+#
+# jobs:
+#   - command: /usr/local/bin/backup.sh
+#     schedule: "0 2 * * *"
+#     metrics:
+#       enabled: true
+#       metrics_dir: ~/.cronwatch/metrics
+#       tags:
+#         - backup

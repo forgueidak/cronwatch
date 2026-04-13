@@ -1,0 +1,27 @@
+# cronwatch escalation policy example
+#
+# Escalation sends alerts to progressively broader channels
+# as consecutive failures accumulate for a single job.
+
+escalation:
+  enabled: true
+
+  # Levels are evaluated in order; the highest matching level wins.
+  levels:
+    - after_failures: 1
+      channels:
+        - slack
+      message_prefix: "[WARNING]"
+
+    - after_failures: 3
+      channels:
+        - slack
+        - email
+      message_prefix: "[CRITICAL]"
+
+    - after_failures: 5
+      channels:
+        - slack
+        - email
+        - webhook
+      message_prefix: "[ESCALATED]"

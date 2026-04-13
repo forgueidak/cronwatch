@@ -1,0 +1,30 @@
+# cronwatch throttle configuration example
+# Throttling prevents repeated alert notifications for the same failing job
+# within a configurable cooldown window.
+
+# Global default throttle settings applied to all jobs unless overridden.
+throttle:
+  # How long (in seconds) to suppress repeated alerts for the same job.
+  # Default: 3600 (1 hour)
+  cooldown_seconds: 3600
+
+  # Directory where throttle state files are persisted.
+  # Each job gets its own state file named after the job.
+  state_dir: /var/lib/cronwatch/throttle
+
+# Per-job throttle overrides (referenced by job name in your cron config).
+jobs:
+  - name: daily-backup
+    command: /usr/local/bin/backup.sh
+    throttle:
+      cooldown_seconds: 86400  # only alert once per day for this job
+
+  - name: health-check
+    command: /usr/local/bin/healthcheck.sh
+    throttle:
+      cooldown_seconds: 300   # alert every 5 minutes if still failing
+
+  - name: low-priority-sync
+    command: /usr/local/bin/sync.sh
+    throttle:
+      cooldown_seconds: 0     # always alert (no throttle)

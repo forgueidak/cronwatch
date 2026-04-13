@@ -2,79 +2,105 @@
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from pathlib import Path
+from typing import Optional
 
 import yaml
-
-DEFAULT_CONFIG_PATH = os.path.expanduser("~/.cronwatch.yaml")
 
 
 @dataclass
 class SlackConfig:
     webhook_url: str = ""
     channel: str = ""
-    notify_on_success: bool = False
+    username: str = "cronwatch"
 
 
 @dataclass
 class EmailConfig:
     smtp_host: str = "localhost"
     smtp_port: int = 25
-    from_addr: str = ""
-    to_addrs: List[str] = field(default_factory=list)
-    notify_on_success: bool = False
+    from_address: str = ""
+    to_addresses: list[str] = field(default_factory=list)
+    use_tls: bool = False
+    username: str = ""
+    password: str = ""
 
 
 @dataclass
 class WebhookConfig:
-    """Generic outbound webhook configuration."""
     url: str = ""
-    method: str = "POST"
-    headers: Dict[str, str] = field(
-        default_factory=lambda: {"Content-Type": "application/json"}
-    )
-    notify_on_success: bool = False
-    notify_on_failure: bool = True
-    timeout: int = 10
+    secret: str = ""
+    timeout_seconds: int = 10
+
+
+@dataclass
+class ThrottleConfig:
+    cooldown_seconds: int = 3600
+    state_dir: str = "/tmp/cronwatch/throttle"
 
 
 @dataclass
 class CronwatchConfig:
-    log_dir: str = "/var/log/cronwatch"
-    history_dir: str = "/var/lib/cronwatch"
+    log_dir: str = "/tmp/cronwatch/logs"
+    history_dir: str = "/tmp/cronwatch/history"
     default_timeout: Optional[int] = None
-    slack: Optional[SlackConfig] = None
-    email: Optional[EmailConfig] = None
-    webhook: Optional[WebhookConfig] = None
+    notify_on_success: bool = False
+    slack: SlackConfig = field(default_factory=SlackConfig)
+    email: EmailConfig = field(default_factory=EmailConfig)
+    webhook: WebhookConfig = field(default_factory=WebhookConfig)
+    throttle: ThrottleConfig = field(default_factory=ThrottleConfig)
 
 
-def load_config(path: str = DEFAULT_CONFIG_PATH) -> CronwatchConfig:
-    """Load configuration from *path*, returning defaults if the file is absent."""
-    if not os.path.exists(path):
+def load_config(path: Optional[str] = None) -> CronwatchConfig:
+    """Load configuration from a YAML file, falling back to defaults."""
+    if path is None:
+        default_locations = [
+            Path.home() / ".config" / "cronwatch" / "config.yaml",
+            Path("/etc/cronwatch/config.yaml"),
+        ]
+        for loc in default_locations:
+            if loc.exists():
+                path = str(loc)
+                break
+
+    if path is None or not Path(path).exists():
         return CronwatchConfig()
 
     with open(path) as fh:
         raw = yaml.safe_load(fh) or {}
 
-    slack = None
-    if slack_raw := raw.get("slack"):
-        slack = SlackConfig(**{k: v for k, v in slack_raw.items() if k in SlackConfig.__dataclass_fields__})
-
-    email = None
-    if email_raw := raw.get("email"):
-        email = EmailConfig(**{k: v for k, v in email_raw.items() if k in EmailConfig.__dataclass_fields__})
-
-    webhook = None
-    if wh_raw := raw.get("webhook"):
-        webhook = WebhookConfig(**{k: v for k, v in wh_raw.items() if k in WebhookConfig.__dataclass_fields__})
+    slack_raw = raw.get("slack", {})
+    email_raw = raw.get("email", {})
+    webhook_raw = raw.get("webhook", {})
+    throttle_raw = raw.get("throttle", {})
 
     return CronwatchConfig(
-        log_dir=raw.get("log_dir", "/var/log/cronwatch"),
-        history_dir=raw.get("history_dir", "/var/lib/cronwatch"),
+        log_dir=raw.get("log_dir", "/tmp/cronwatch/logs"),
+        history_dir=raw.get("history_dir", "/tmp/cronwatch/history"),
         default_timeout=raw.get("default_timeout"),
-        slack=slack,
-        email=email,
-        webhook=webhook,
+        notify_on_success=raw.get("notify_on_success", False),
+        slack=SlackConfig(
+            webhook_url=slack_raw.get("webhook_url", ""),
+            channel=slack_raw.get("channel", ""),
+            username=slack_raw.get("username", "cronwatch"),
+        ),
+        email=EmailConfig(
+            smtp_host=email_raw.get("smtp_host", "localhost"),
+            smtp_port=email_raw.get("smtp_port", 25),
+            from_address=email_raw.get("from_address", ""),
+            to_addresses=email_raw.get("to_addresses", []),
+            use_tls=email_raw.get("use_tls", False),
+            username=email_raw.get("username", ""),
+            password=email_raw.get("password", ""),
+        ),
+        webhook=WebhookConfig(
+            url=webhook_raw.get("url", ""),
+            secret=webhook_raw.get("secret", ""),
+            timeout_seconds=webhook_raw.get("timeout_seconds", 10),
+        ),
+        throttle=ThrottleConfig(
+            cooldown_seconds=throttle_raw.get("cooldown_seconds", 3600),
+            state_dir=throttle_raw.get("state_dir", "/tmp/cronwatch/throttle"),
+        ),
     )

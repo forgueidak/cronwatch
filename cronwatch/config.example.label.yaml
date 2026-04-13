@@ -1,0 +1,40 @@
+# cronwatch label-based filtering example
+#
+# Attach labels to jobs and use include/exclude rules to control
+# which jobs receive notifications, appear in reports, or are
+# targeted by a specific watcher run.
+
+jobs:
+  - command: /usr/local/bin/backup.sh
+    labels:
+      - backup
+      - nightly
+      - critical
+
+  - command: /usr/local/bin/cleanup.sh
+    labels:
+      - maintenance
+      - nightly
+
+  - command: /usr/local/bin/report.sh
+    labels:
+      - reporting
+      - weekly
+
+# Only process jobs that carry the "nightly" label.
+label_filter:
+  include:
+    - nightly
+
+# Alternatively, skip jobs tagged "maintenance":
+# label_filter:
+#   exclude:
+#     - maintenance
+
+# Both rules can be combined — the job must match at least one
+# include label AND must not match any exclude label.
+# label_filter:
+#   include:
+#     - critical
+#   exclude:
+#     - maintenance

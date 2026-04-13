@@ -1,31 +1,37 @@
-# cronwatch configuration file
-# Copy this file to ~/.cronwatch/config.yaml and adjust the values.
+# cronwatch configuration example
+# Copy to config.yaml and adjust as needed.
 
-# Directory where cronwatch stores job execution logs.
-log_dir: /var/log/cronwatch
+# --- Job definitions -------------------------------------------------------
+jobs:
+  - name: backup-db
+    command: "/usr/local/bin/backup.sh"
+    schedule: "0 2 * * *"          # daily at 02:00  (or @daily)
+    timeout: 300                   # seconds; omit for no timeout
 
-# Number of days to retain log files before they are pruned.
-retention_days: 30
+  - name: send-report
+    command: "python /opt/reports/send.py"
+    schedule: "@weekly"
 
-# ---------------------------------------------------------------------------
-# Slack integration
-# ---------------------------------------------------------------------------
+# --- Slack integration -----------------------------------------------------
 slack:
-  # Incoming Webhook URL obtained from your Slack app configuration.
-  webhook_url: https://hooks.slack.com/services/XXXX/YYYY/ZZZZ
-
-  # Optional: override the default channel configured on the webhook.
+  enabled: true
+  webhook_url: "https://hooks.slack.com/services/XXX/YYY/ZZZ"
   channel: "#alerts"
+  notify_on_success: false
 
-# ---------------------------------------------------------------------------
-# Email integration (SMTP)
-# ---------------------------------------------------------------------------
+# --- Email integration -----------------------------------------------------
 email:
-  smtp_host: smtp.example.com
+  enabled: false
+  smtp_host: "smtp.example.com"
   smtp_port: 587
-  username: alerts@example.com
-  password: supersecret
-  from_addr: "CronWatch <alerts@example.com>"
+  username: "alerts@example.com"
+  password: "s3cr3t"
+  from_addr: "alerts@example.com"
   to_addrs:
-    - ops@example.com
-    - oncall@example.com
+    - "ops@example.com"
+  notify_on_success: false
+
+# --- Logging ---------------------------------------------------------------
+logging:
+  log_dir: "/var/log/cronwatch"
+  level: "INFO"

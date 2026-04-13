@@ -1,0 +1,21 @@
+# cronwatch dependency check configuration example
+#
+# Dependency checks run before a job is executed.
+# If any check fails, the job is skipped and an alert is raised.
+
+dependency:
+  enabled: true
+
+  # Shell commands that must be present on PATH before the job runs.
+  # Uses `which` / shutil.which internally.
+  commands:
+    - curl
+    - psql
+    - aws
+
+  # TCP host:port pairs that must be reachable before the job runs.
+  # Useful for verifying a database or API endpoint is up.
+  tcp_checks:
+    - localhost:5432      # PostgreSQL
+    - localhost:6379      # Redis
+    - api.example.com:443

@@ -1,0 +1,27 @@
+# cronwatch tag-based filtering example
+#
+# Tags can be attached to jobs in your cron wrapper scripts by passing
+# --tags to the `cronwatch run` command, e.g.:
+#
+#   cronwatch run --tags billing,nightly -- python bill.py
+#
+# This file shows how to configure tag-based alert and digest filtering.
+
+tags:
+  # Only send Slack notifications for jobs tagged with these values.
+  # Leave empty (or omit) to notify for all jobs.
+  notify_include:
+    - billing
+    - nightly
+
+  # Never send notifications for jobs carrying these tags.
+  notify_exclude:
+    - debug
+    - dry-run
+
+  # When generating digests, restrict to these tags.
+  digest_include: []
+
+  # Exclude these tags from digest output.
+  digest_exclude:
+    - dry-run

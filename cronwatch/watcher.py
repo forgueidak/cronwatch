@@ -1,60 +1,62 @@
-"""Watcher module: orchestrates job execution, logging, and notifications."""
+"""Core watch loop: run a job, log it, record history, and notify."""
 
 from __future__ import annotations
 
 import logging
 from typing import Optional
 
-from cronwatch.config import CronwatchConfig, load_config
-from cronwatch.runner import JobResult, run_job
+from cronwatch.config import CronwatchConfig
+from cronwatch.history import record_result
 from cronwatch.logger import write_job_log
 from cronwatch.notifier import send_notifications
+from cronwatch.runner import JobResult, run_job
 
 logger = logging.getLogger(__name__)
 
 
 def watch(
     command: str,
-    job_name: Optional[str] = None,
-    config_path: Optional[str] = None,
+    config: CronwatchConfig,
     timeout: Optional[int] = None,
+    notify_on_success: bool = False,
 ) -> JobResult:
-    """Run *command* under cronwatch supervision.
+    """Run *command*, log the result, record history, and dispatch notifications.
 
-    Loads configuration, executes the job, writes a structured log entry,
-    and dispatches notifications when the job fails (or always, if configured).
+    Args:
+        command: Shell command string to execute.
+        config: Loaded CronwatchConfig instance.
+        timeout: Optional override for the job timeout in seconds.
+        notify_on_success: When True, send notifications even on success.
 
-    Returns the :class:`~cronwatch.runner.JobResult` for the run.
+    Returns:
+        The JobResult produced by running the command.
     """
-    cfg: CronwatchConfig = load_config(config_path)
+    effective_timeout = timeout if timeout is not None else config.timeout
 
-    effective_timeout = timeout if timeout is not None else cfg.timeout
-    effective_name = job_name or command
+    logger.info("Starting job: %s", command)
+    result = run_job(command, timeout=effective_timeout)
+    logger.info(
+        "Job finished: exit_code=%s duration=%.2fs",
+        result.exit_code,
+        result.duration,
+    )
 
-    logger.debug("Starting job '%s' (timeout=%s)", effective_name, effective_timeout)
-
-    result: JobResult = run_job(command, job_name=effective_name, timeout=effective_timeout)
-
-    # Always write a log entry.
-    if cfg.log_dir:
+    # Persist structured log entry
+    if config.log_dir:
         try:
-            write_job_log(result, log_dir=cfg.log_dir)
-        except Exception as exc:  # pragma: no cover
+            write_job_log(result, log_dir=config.log_dir)
+        except OSError as exc:
             logger.warning("Failed to write job log: %s", exc)
 
-    # Notify on failure, or on every run when notify_on_success is set.
-    should_notify = (not result.success) or cfg.notify_on_success
-    if should_notify:
-        try:
-            send_notifications(result, cfg)
-        except Exception as exc:  # pragma: no cover
-            logger.warning("Notification error: %s", exc)
+    # Append to history file
+    try:
+        record_result(result, history_file=config.history_file)
+    except OSError as exc:
+        logger.warning("Failed to record history: %s", exc)
 
-    if result.success:
-        logger.info("Job '%s' completed successfully.", effective_name)
-    else:
-        logger.error(
-            "Job '%s' failed (exit_code=%s).", effective_name, result.exit_code
-        )
+    # Notify on failure (or always when flag is set)
+    failed = result.exit_code != 0 or result.timed_out
+    if failed or notify_on_success:
+        send_notifications(result, config)
 
     return result

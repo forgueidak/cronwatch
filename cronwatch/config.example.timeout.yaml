@@ -1,0 +1,29 @@
+# cronwatch timeout policy configuration example
+#
+# Timeout settings control how long a job is allowed to run before
+# cronwatch intervenes. A grace period allows the process to clean up
+# after SIGTERM before SIGKILL is sent.
+
+jobs:
+  - command: "/usr/local/bin/nightly-backup.sh"
+    schedule: "0 2 * * *"
+    timeout:
+      # Maximum wall-clock seconds the job may run.
+      seconds: 300
+
+      # Seconds to wait after SIGTERM before sending SIGKILL.
+      grace_seconds: 10
+
+      # Additional seconds to wait after SIGKILL before giving up.
+      kill_after: 5
+
+      # Set to false to disable timeout enforcement for this job.
+      enabled: true
+
+  - command: "/usr/local/bin/quick-check.sh"
+    schedule: "*/5 * * * *"
+    timeout:
+      seconds: 30
+      grace_seconds: 3
+      kill_after: 3
+      enabled: true

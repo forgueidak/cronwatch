@@ -1,0 +1,28 @@
+# cronwatch output_filter configuration example
+#
+# Output filtering controls how stdout/stderr from cron jobs
+# is processed before being logged or sent in notifications.
+
+output_filter:
+  # Maximum number of lines to retain from output.
+  # Lines beyond this limit are dropped and output is marked truncated.
+  max_lines: 100
+
+  # Maximum number of bytes to retain from output.
+  # Content is hard-truncated at this byte boundary.
+  max_bytes: 8192
+
+  # List of Python regex patterns whose matches are replaced with [REDACTED].
+  # Useful for hiding secrets, tokens, or PII from logs and alerts.
+  redact_patterns:
+    - "(?i)password=\\S+"
+    - "(?i)token=\\S+"
+    - "AKIA[0-9A-Z]{16}"   # AWS access key pattern
+
+  # If set, only lines matching this pattern are kept.
+  # Useful for surfacing only error lines from verbose output.
+  # include_pattern: "(?i)(error|warn|fail)"
+
+  # If set, lines matching this pattern are removed.
+  # Useful for stripping noisy debug lines.
+  # exclude_pattern: "^DEBUG"

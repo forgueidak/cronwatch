@@ -1,0 +1,31 @@
+# cronwatch configuration file
+# Copy this file to ~/.cronwatch/config.yaml and adjust the values.
+
+# Directory where cronwatch stores job execution logs.
+log_dir: /var/log/cronwatch
+
+# Number of days to retain log files before they are pruned.
+retention_days: 30
+
+# ---------------------------------------------------------------------------
+# Slack integration
+# ---------------------------------------------------------------------------
+slack:
+  # Incoming Webhook URL obtained from your Slack app configuration.
+  webhook_url: https://hooks.slack.com/services/XXXX/YYYY/ZZZZ
+
+  # Optional: override the default channel configured on the webhook.
+  channel: "#alerts"
+
+# ---------------------------------------------------------------------------
+# Email integration (SMTP)
+# ---------------------------------------------------------------------------
+email:
+  smtp_host: smtp.example.com
+  smtp_port: 587
+  username: alerts@example.com
+  password: supersecret
+  from_addr: "CronWatch <alerts@example.com>"
+  to_addrs:
+    - ops@example.com
+    - oncall@example.com

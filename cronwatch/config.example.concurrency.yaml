@@ -1,0 +1,23 @@
+# cronwatch concurrency guard configuration example
+# Prevents more than N instances of a job from running at the same time.
+
+concurrency:
+  # Set to true to enable the concurrency guard.
+  enabled: true
+
+  # Maximum number of simultaneous instances allowed for a single job.
+  # Default: 1 (no parallel runs).
+  max_instances: 1
+
+  # Directory where per-job PID slot files are stored.
+  # Defaults to ~/.cronwatch/concurrency
+  state_dir: ~/.cronwatch/concurrency
+
+# Usage in a job definition:
+#
+# jobs:
+#   - name: heavy-etl
+#     command: /usr/local/bin/run_etl.sh
+#     concurrency:
+#       enabled: true
+#       max_instances: 2   # allow up to 2 parallel runs

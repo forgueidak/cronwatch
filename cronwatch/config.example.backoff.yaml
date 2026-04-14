@@ -1,0 +1,23 @@
+# cronwatch backoff configuration example
+# Exponential backoff controls the delay between retry attempts.
+
+backoff:
+  # Enable exponential backoff between retries.
+  # When disabled all retry delays are 0 seconds.
+  enabled: true
+
+  # Initial delay in seconds before the second attempt.
+  base_delay: 2.0
+
+  # Multiply the previous delay by this factor on each retry.
+  multiplier: 2.0
+
+  # Maximum delay cap in seconds regardless of multiplier growth.
+  max_delay: 120.0
+
+  # Add random jitter to prevent thundering-herd on simultaneous jobs.
+  jitter: true
+
+  # Fraction of the computed delay to use as the jitter spread.
+  # e.g. 0.5 means ±50 % of the computed delay is added randomly.
+  jitter_range: 0.5

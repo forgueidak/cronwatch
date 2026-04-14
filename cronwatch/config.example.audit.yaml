@@ -1,0 +1,29 @@
+# cronwatch audit log configuration example
+# ─────────────────────────────────────────
+# The audit module writes an immutable, append-only JSONL log for every
+# significant cronwatch event (job runs, alerts, lock acquisitions, etc.).
+
+audit:
+  # Directory where per-job audit files are stored.
+  # Each job gets its own file: <log_dir>/<job_name>.audit.jsonl
+  log_dir: /var/log/cronwatch/audit
+
+  # Events to record.  Omit or set to [] to record everything.
+  # Recognised event names:
+  #   job_run        – every execution attempt
+  #   alert_sent     – Slack / email notification dispatched
+  #   lock_acquired  – concurrency lock granted
+  #   lock_denied    – concurrency lock refused
+  #   retry          – a retry attempt started
+  #   escalation     – an escalation level was triggered
+  events:
+    - job_run
+    - alert_sent
+    - lock_acquired
+    - lock_denied
+    - retry
+    - escalation
+
+  # Optional actor name written into every entry (useful when multiple
+  # hosts share the same audit store via NFS/S3-mount).
+  actor: cronwatch

@@ -1,0 +1,22 @@
+# cronwatch quota configuration example
+#
+# Quota enforcement limits how many times a job may run within a rolling
+# time window. If the quota is exceeded the job is skipped and a warning
+# is logged. This is useful for preventing runaway cron schedules from
+# hammering external services or consuming excessive resources.
+
+quota:
+  # Set to true to enable quota enforcement for this job.
+  enabled: true
+
+  # Maximum number of successful run starts allowed within the window.
+  max_runs: 5
+
+  # Length of the rolling window in seconds.
+  # 3600  = 1 hour
+  # 86400 = 1 day
+  window_seconds: 3600
+
+  # Directory where per-job quota state files are stored.
+  # Defaults to ~/.cronwatch/quota
+  state_dir: ~/.cronwatch/quota

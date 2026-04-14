@@ -1,0 +1,19 @@
+# cronwatch circuit breaker configuration example
+#
+# The circuit breaker prevents a repeatedly failing job from running
+# until a cooldown period has elapsed.  After `failure_threshold`
+# consecutive failures the circuit opens.  Once `cooldown_seconds`
+# have passed a single probe run is allowed (half-open); if it
+# succeeds the circuit closes again.
+
+circuit_breaker:
+  enabled: true
+
+  # Number of consecutive failures required to open the circuit.
+  failure_threshold: 3
+
+  # Seconds the circuit stays open before allowing a probe run.
+  cooldown_seconds: 300
+
+  # Directory used per-job circuit state.
+  state_dir: /var/lib/cronwatch/circuit

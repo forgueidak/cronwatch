@@ -1,0 +1,29 @@
+# cronwatch heartbeat configuration example
+#
+# Heartbeat tracking detects jobs that have stopped running entirely.
+# If a job hasn't been seen within `interval_seconds`, cronwatch flags it
+# as a missed heartbeat so you can alert on silent failures.
+
+heartbeat:
+  # Enable or disable heartbeat tracking
+  enabled: true
+
+  # Maximum allowed gap (in seconds) between job runs before it is
+  # considered a missed heartbeat.
+  #
+  # Examples:
+  #   3600   = 1 hour  (for jobs that should run every hour)
+  #   86400  = 1 day   (for daily jobs)
+  #   604800 = 1 week  (for weekly jobs)
+  interval_seconds: 3600
+
+  # Directory where per-job heartbeat state files are stored.
+  # Each job gets its own file named after the sanitized job name.
+  state_dir: /var/lib/cronwatch/heartbeat
+
+# Usage in your cron wrapper:
+#
+#   cronwatch run --name "nightly-backup" -- /usr/local/bin/backup.sh
+#
+# cronwatch will call record_heartbeat() after a successful run and
+# check_heartbeat() before each run to detect silence.

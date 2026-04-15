@@ -1,0 +1,20 @@
+# cronwatch cooldown configuration example
+#
+# Cooldown prevents a job from being triggered again too soon after
+# its last recorded run. Useful for jobs that should not overlap
+# or run back-to-back in rapid succession.
+
+cooldown:
+  # Enable or disable cooldown enforcement (default: false)
+  enabled: true
+
+  # Minimum number of seconds that must pass between runs.
+  # If the job ran less than this many seconds ago, the current
+  # run will be suppressed and a warning logged.
+  # Default: 300 (5 minutes)
+  min_interval_seconds: 600
+
+  # Directory used to persist last-run timestamps.
+  # One JSON file is created per job name.
+  # Default: /tmp/cronwatch/cooldown
+  state_dir: /var/lib/cronwatch/cooldown

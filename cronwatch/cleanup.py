@@ -62,3 +62,32 @@ def purge_old_files(
                 pass  # best-effort; skip files we cannot remove
 
     return deleted, skipped
+
+
+def find_files_by_pattern(
+    directory: str | Path,
+    pattern: str,
+    max_age_days: int | None = None,
+) -> List[Path]:
+    """Return files in *directory* matching a glob *pattern*.
+
+    Args:
+        directory: Directory to scan.
+        pattern: Glob pattern to match filenames against (e.g. ``"*.log"``).
+        max_age_days: When provided, only files older than this many days
+            are included.  When *None*, all matching files are returned.
+
+    Returns:
+        A sorted list of :class:`~pathlib.Path` objects for matching files.
+    """
+    root = Path(directory)
+    if not root.is_dir():
+        return []
+
+    matches = [
+        entry
+        for entry in root.glob(pattern)
+        if entry.is_file()
+        and (max_age_days is None or _age_days(entry) > max_age_days)
+    ]
+    return sorted(matches)

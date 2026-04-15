@@ -1,0 +1,18 @@
+# cronwatch pipeline configuration example
+# Pipelines let you register ordered hooks that run after a job completes.
+# Each step can be conditioned on success or failure.
+
+pipeline:
+  stop_on_error: false   # abort remaining steps when a step raises an exception
+
+  # Steps are registered in code via PipelineStep objects.
+  # This config controls global pipeline behaviour only.
+  # Example usage in watcher integration:
+  #
+  # steps:
+  #   - name: send_slack
+  #     on_failure_only: true
+  #   - name: record_audit
+  #     on_failure_only: false
+  #   - name: ping_healthcheck
+  #     on_success_only: true

@@ -1,0 +1,12 @@
+# cronwatch sampling configuration example
+# Sampling lets you probabilistically skip notifications or watcher actions.
+# Useful for high-frequency jobs where you only want occasional alerts.
+
+sampling:
+  enabled: true
+
+  # Probability of proceeding (0.0 = never, 1.0 = always)
+  rate: 0.25
+
+  # Optional fixed seed for reproducible behaviour in tests
+  # seed: 42

@@ -1,0 +1,14 @@
+# cronwatch profile configuration example
+# Track job execution duration and warn when a job runs unusually slow.
+
+profile:
+  enabled: true
+
+  # Directory to store per-job duration history
+  directory: .cronwatch/profiles
+
+  # Number of recent runs used to compute the baseline mean
+  window: 20
+
+  # Alert when duration exceeds mean * warn_factor
+  warn_factor: 2.0

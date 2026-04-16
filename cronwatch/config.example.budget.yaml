@@ -1,0 +1,12 @@
+# cronwatch budget configuration example
+# Enforce a maximum wall-clock runtime for a cron job.
+
+budget:
+  enabled: true
+
+  # Hard limit — job is marked as failed if it runs longer than this.
+  max_seconds: 120.0
+
+  # Optional soft limit — a warning is emitted but the job is not failed.
+  # Must be less than max_seconds.
+  warn_at_seconds: 90.0

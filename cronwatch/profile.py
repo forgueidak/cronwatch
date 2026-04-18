@@ -93,6 +93,11 @@ def check_profile(result: JobResult, opts: ProfileOptions) -> Optional[ProfileRe
     mean = statistics.mean(history)
     threshold = mean * opts.warn_factor
     slow = duration > threshold
-    msg = (f"Duration {duration:.2f}s exceeds threshold {threshold:.2f}s (mean={mean:.2f}s)"
-           if slow else f"Duration {duration:.2f}s within normal range (mean={mean:.2f}s)")
-    return ProfileResult(slow=slow, duration=duration, mean=mean, threshold=threshold, message=msg)
+    if slow:
+        message = (
+            f"Duration {duration:.2f}s exceeds threshold {threshold:.2f}s "
+            f"(mean={mean:.2f}s, factor={opts.warn_factor}x)."
+        )
+    else:
+        message = f"Duration {duration:.2f}s is within normal range (mean={mean:.2f}s)."
+    return ProfileResult(slow=slow, duration=duration, mean=mean, threshold=threshold, message=message)

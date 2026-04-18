@@ -67,11 +67,25 @@ def record_duration(directory: Path, command: str, duration: float) -> None:
         f.write(json.dumps({"duration": duration}) + "\n")
 
 
+def trim_history(directory: Path, command: str, keep: int = 200) -> None:
+    """Trim the profile log for *command* to the most recent *keep* entries.
+
+    Prevents profile files from growing unboundedly over time.
+    """
+    path = _profile_path(directory, command)
+    if not path.exists():
+        return
+    lines = path.read_text().splitlines()
+    if len(lines) > keep:
+        path.write_text("\n".join(lines[-keep:]) + "\n")
+
+
 def check_profile(result: JobResult, opts: ProfileOptions) -> Optional[ProfileResult]:
     if not opts.enabled or not result.success:
         return None
     duration = result.duration
     record_duration(opts.directory, result.command, duration)
+    trim_history(opts.directory, result.command)
     history = load_durations(opts.directory, result.command, opts.window)
     if len(history) < 2:
         return ProfileResult(slow=False, duration=duration, mean=None, threshold=None,

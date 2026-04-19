@@ -1,0 +1,20 @@
+# cronwatch notifier_filter configuration example
+# Controls which job results trigger notifications.
+
+notifier_filter:
+  enabled: true
+
+  # Only notify when the job fails (non-zero exit code)
+  only_on_failure: false
+
+  # Suppress notifications for specific exit codes
+  # Useful for jobs that use exit code 1 as a soft warning
+  suppress_exit_codes:
+    - 0
+
+  # Only notify if the job ran for at least this many seconds
+  # Useful to skip trivial fast jobs
+  min_duration_seconds: 0.0
+
+  # Only notify if the job produced stderr output
+  require_stderr: false

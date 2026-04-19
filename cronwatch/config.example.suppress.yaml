@@ -1,0 +1,22 @@
+# cronwatch suppress configuration example
+# Suppress notifications under certain conditions.
+
+suppress:
+  enabled: true
+
+  # Skip notifications when the job exits with these codes
+  exit_codes:
+    - 0
+    - 75  # EX_TEMPFAIL — transient error
+
+  # Suppress during these local time windows (24h HH:MM)
+  time_windows:
+    - start: "02:00"
+      end: "04:30"   # nightly maintenance window
+    - start: "23:00"
+      end: "00:30"   # overnight wrap
+
+  # Suppress on these weekdays (0=Monday, 6=Sunday)
+  weekdays:
+    - 5  # Saturday
+    - 6  # Sunday

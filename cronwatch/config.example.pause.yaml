@@ -1,0 +1,24 @@
+# cronwatch pause configuration example
+# Allows a job to be temporarily paused without removing the cron entry.
+
+pause:
+  # Set to false to disable pause/resume feature entirely.
+  enabled: true
+
+  # Directory where pause state files are stored.
+  # Each job gets its own JSON file: <state_dir>/<job_name>.json
+  state_dir: ~/.cronwatch/pause
+
+# Usage examples (via CLI — see `cronwatch pause --help`):
+#
+#   Pause a job indefinitely:
+#     cronwatch pause --job "my_backup" --reason "maintenance window"
+#
+#   Pause a job until a specific time (ISO-8601):
+#     cronwatch pause --job "my_backup" --resume-after "2025-12-01T06:00:00+00:00"
+#
+#   Resume a paused job immediately:
+#     cronwatch resume --job "my_backup"
+#
+#   Check whether a job is paused:
+#     cronwatch status --job "my_backup"

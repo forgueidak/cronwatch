@@ -13,6 +13,9 @@ jobs:
       # When true, a notification is sent whenever the output changes
       # compared to the previous successful run.
       notify_on_change: true
+      # Number of previous snapshots to retain per job.
+      # Older snapshots are pruned automatically. Defaults to 5.
+      retain: 10
 
   - command: "/usr/bin/check-inventory"
     schedule: "*/15 * * * *"
@@ -21,6 +24,9 @@ jobs:
       dir: "/var/lib/cronwatch/snapshots"
       # Set to false to only log the change without alerting.
       notify_on_change: false
+      # Retain only the last 3 snapshots for high-frequency jobs
+      # to avoid excessive disk usage.
+      retain: 3
 
   - command: "/usr/bin/backup.sh"
     schedule: "@daily"

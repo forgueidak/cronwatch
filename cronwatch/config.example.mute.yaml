@@ -1,0 +1,22 @@
+# cronwatch mute configuration example
+# Mute silences notifications for a job for a fixed duration
+# without stopping the job from running.
+
+job_name: my_cron_job
+
+mute:
+  # Enable or disable the mute feature
+  enabled: true
+
+  # Directory where mute state files are stored
+  state_dir: /var/lib/cronwatch/mute
+
+# To mute a job from the command line or your own script:
+#
+#   from cronwatch.mute import mute_job
+#   mute_job("/var/lib/cronwatch/mute", "my_cron_job", duration_seconds=3600, reason="Maintenance window")
+#
+# To clear the mute:
+#
+#   from cronwatch.mute import clear_mute_state
+#   clear_mute_state("/var/lib/cronwatch/mute", "my_cron_job")

@@ -1,0 +1,19 @@
+# cronwatch roster configuration
+# Controls registration and tracking of known cron jobs.
+
+roster:
+  # Enable or disable the roster feature entirely
+  enabled: true
+
+  # Directory where per-job roster JSON files are stored
+  roster_dir: /var/lib/cronwatch/roster
+
+# Example job definition (used programmatically or via CLI):
+# name: daily-backup
+# command: /usr/local/bin/backup.sh
+# schedule: "0 2 * * *"
+# tags:
+#   - backup
+#   - nightly
+# enabled: true
+# description: "Nightly database backup job"

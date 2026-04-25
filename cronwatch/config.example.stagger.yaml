@@ -1,0 +1,21 @@
+# cronwatch stagger configuration example
+# Stagger distributes job start times to prevent multiple cron jobs
+# from hammering shared resources simultaneously (thundering herd).
+
+stagger:
+  # Enable or disable stagger (default: false)
+  enabled: true
+
+  # Maximum number of seconds to delay job start.
+  # The actual delay is chosen in [0, max_delay_seconds).
+  max_delay_seconds: 30.0
+
+  # Optional extra seed string mixed into the delay calculation.
+  # Useful when you want different jobs with the same name on different
+  # hosts to receive different delays.
+  seed: "host-A"
+
+  # When true, the delay is derived deterministically from the job name
+  # and seed using SHA-256, so the same job always gets the same delay.
+  # When false (default), the delay is chosen randomly each run.
+  deterministic: false

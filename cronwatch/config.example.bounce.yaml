@@ -1,0 +1,20 @@
+# cronwatch bounce (flap detection) configuration example
+#
+# Bounce detection identifies jobs that change state rapidly (flapping),
+# which often indicates an unstable environment or misconfigured job.
+# When flapping is detected, downstream notifications can be suppressed
+# or a dedicated alert can be raised.
+
+bounce:
+  # Enable flap detection (default: false)
+  enabled: true
+
+  # Time window in seconds to count state transitions (default: 300)
+  window_seconds: 300
+
+  # Minimum number of transitions within the window to be considered
+  # flapping (default: 3)
+  min_flaps: 3
+
+  # Directory where per-job bounce state files are stored
+  state_dir: /var/lib/cronwatch/bounce

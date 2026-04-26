@@ -1,0 +1,20 @@
+# cronwatch splay configuration example
+# Splay spreads job start times across a random window to prevent
+# multiple jobs from hammering a shared resource simultaneously.
+
+jobs:
+  - name: nightly-report
+    command: /usr/local/bin/generate-report.sh
+    schedule: "0 2 * * *"
+
+    splay:
+      # Enable randomised start delay.
+      enabled: true
+
+      # Maximum number of seconds to delay the job start.
+      # The actual delay is chosen uniformly at random from [0, window_seconds].
+      window_seconds: 120
+
+      # Optional fixed seed for deterministic delays (useful in tests).
+      # Remove or leave blank for true randomness.
+      # seed: 42
